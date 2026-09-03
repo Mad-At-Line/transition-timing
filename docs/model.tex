@@ -1,0 +1,350 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\definecolor{linkblue}{RGB}{25,60,130}
+\usepackage[colorlinks=true,linkcolor=linkblue,citecolor=linkblue,urlcolor=linkblue]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+
+\graphicspath{{../figures/}}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\cface}{c_{\mathrm{f}}}
+\newcommand{\pderiv}[2]{\frac{\partial #1}{\partial #2}}
+
+\title{An optimal-stopping model for the timing of social transition}
+\author{Madeline}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We formulate the choice of when to socially transition as a deterministic optimal-stopping problem in which the decision-maker balances an increasing marginal cost of continuing to present as their assigned sex against a decreasing marginal cost of being socially transitioned and read as transgender. The second cost is driven by a clock probability that combines several independent cues multiplicatively, only one of which is hormone-gated. We derive the first- and second-order conditions, give a sufficient condition for uniqueness of the interior optimum, show that step discontinuities in the switching cost at context-formation dates generically relocate the optimum to the step, and compute analytic sensitivities of the optimum to every parameter via the implicit function theorem. All derivations are verified against a numerical implementation. The central qualitative findings are: (i)~the optimum is a vector, one entry per social context, not a scalar; (ii)~non-hormonal preparation has increasing returns and moves the optimum earlier; (iii)~any weighting that respects the irreversibility of time collapses the optimum toward the present; and (iv)~bias in the decision-maker's perception of their own face has little effect on the optimum while other cues dominate, but becomes first-order once those cues are removed. The model has no predictive power over the numerical value of the optimum; its content lies entirely in the signs of the partial derivatives.
+\end{abstract}
+
+\section{Setup}
+
+Let $t\ge 0$ denote time in months since the start of hormone therapy (HRT), and let $T$ be a planning horizon. The decision variable is a switching time $\tau\in[0,T]$: before $\tau$ the decision-maker presents as their assigned sex (``boymodes''); from $\tau$ onward they are socially transitioned.
+
+Three cost streams are defined on $[0,T]$, all in a common unit of disutility per month.
+
+\paragraph{Boymoding cost.} $B(t)\ge 0$ is the marginal cost of continuing to boymode at time $t$. We take
+\begin{equation}
+  B(t) = B_0\,(1+\beta t), \qquad B_0>0,\; \beta\ge 0. \label{eq:B}
+\end{equation}
+The linear growth term $\beta$ is the important modelling choice. Most informal treatments set $\beta=0$; we argue in \S\ref{sec:sens} that $\beta>0$ is the empirically relevant case and that it dominates the sensitivity of the optimum.
+
+\paragraph{Life-lost term.} $\ell(t)\ge 0$ is the marginal value of authentic time at $t$, which is forgone while boymoding. Unlike $B$, this is not a rate of discomfort but an opportunity cost of an irreversible resource. We take
+\begin{equation}
+  \ell(t) = \ell_0\, e^{-\lambda t}, \qquad \ell_0\ge 0,\; \lambda>0, \label{eq:ell}
+\end{equation}
+decreasing in $t$ to reflect that early time (e.g.\ the first year of university) is scarcer than later time.
+
+\paragraph{Visible-trans cost.} After switching, the marginal cost at time $t$ is
+\begin{equation}
+  V(t;r) = A\,C(t;r), \label{eq:V}
+\end{equation}
+where $A>0$ is a context-hostility coefficient and $C(t;r)\in[0,1]$ is the probability of being read as transgender (``clocked'') in a brief encounter, as a function of time on HRT and a preparation fraction $r\in[0,1]$ capturing non-hormonal work (hair removal, brow shaping, voice training, presentation).
+
+\paragraph{Switching cost.} $S(\tau)\ge 0$ is a one-off cost paid at the switch. It contains a smooth part $s_0$ and step discontinuities at dates at which new social contexts form:
+\begin{equation}
+  S(\tau) = s_0 + \sum_j \Delta_j\, H(\tau - t_j), \qquad \Delta_j > 0, \label{eq:S}
+\end{equation}
+with $H$ the right-continuous Heaviside function. The interpretation is that introducing oneself into a context on the day it forms costs nothing beyond $s_0$, whereas re-introducing oneself after the context has formed with the old name costs an additional $\Delta_j$ (the correction burden and the prior held by everyone in that context).
+
+\section{Clock probability}
+\label{sec:clock}
+
+Being clocked is a disjunction: a person is read as trans if \emph{any} sufficiently strong cue fires. Treating cues as independent failure modes gives
+\begin{equation}
+  C(t;r) = 1 - \prod_{i\in\mathcal{I}} \bigl(1 - c_i(t;r)\bigr) \;=\; 1 - \Pi(t;r), \label{eq:C}
+\end{equation}
+where $c_i$ is the probability that cue $i$ alone causes a clock and $\Pi$ is the survival product. We use four cues, $\mathcal{I}=\{\mathrm{face},\mathrm{hair},\mathrm{brow},\mathrm{voice}\}$.
+
+\paragraph{Face cue (hormone-gated).}
+\begin{equation}
+  \cface(t) = c_\infty + (c_0 - c_\infty)\,\sigma\!\bigl(-k(t-t_h)\bigr), \qquad \sigma(x) = \frac{1}{1+e^{-x}}, \label{eq:cface}
+\end{equation}
+with $c_0$ the face-only clock probability at $t=0$, $c_\infty$ the floor set by bone structure (what HRT cannot change), $k$ the rate of facial change and $t_h$ the half-way month. Limits: $\cface\to c_0$ as $t\to-\infty$ and $\cface\to c_\infty$ as $t\to\infty$. The derivative is
+\begin{equation}
+  \cface'(t) = -(c_0-c_\infty)\,k\,\sigma(-k(t-t_h))\bigl[1-\sigma(-k(t-t_h))\bigr] \;\le\; 0. \label{eq:dcface}
+\end{equation}
+
+\paragraph{Non-hormonal cues.} For $i\in\{\mathrm{hair},\mathrm{brow},\mathrm{voice}\}$,
+\begin{equation}
+  c_i(r) = c_i^0\,(1 - e_i\, r), \qquad c_i^0\in[0,1],\; e_i\in[0,1], \label{eq:ci}
+\end{equation}
+where $e_i$ is the fraction of the cue removable at full preparation. These cues do not depend on $t$: HRT does not remove terminal facial hair, reshape brows, or change the voice.
+
+\begin{lemma}[Derivatives of the clock probability]\label{lem:dC}
+With $\Pi$ as in \eqref{eq:C},
+\begin{align}
+  \pderiv{C}{r} &= -\,\Pi\sum_{i\ne\mathrm{f}} \frac{c_i^0 e_i}{1-c_i(r)} \;\le\; 0, \label{eq:dCdr}\\
+  \pderiv{C}{t} &= \Pi\,\frac{\cface'(t)}{1-\cface(t)} \;\le\; 0, \label{eq:dCdt}\\
+  \pderiv{C}{\cface} &= \frac{\Pi}{1-\cface} = \prod_{i\ne\mathrm{f}}\bigl(1-c_i(r)\bigr) \;\ge\; 0. \label{eq:dCdcf}
+\end{align}
+\end{lemma}
+\begin{proof}
+$\ln\Pi = \sum_i \ln(1-c_i)$, so $\partial_x \Pi = \Pi\sum_i \frac{-\partial_x c_i}{1-c_i}$ for any parameter $x$. For $x=r$, $\partial_r c_i = -c_i^0 e_i$ for the non-hormonal cues and $0$ for the face; for $x=t$ only the face term survives; for $x=\cface$ the sum collapses to a single term. Then $C=1-\Pi$ gives the signs.
+\end{proof}
+
+Equation \eqref{eq:dCdcf} will matter in \S\ref{sec:bias}: the sensitivity of $C$ to the face is exactly the survival product of the \emph{other} cues, which is increasing in $r$.
+
+\section{Objective, first- and second-order conditions}
+\label{sec:foc}
+
+The total cost of switching at $\tau$ is
+\begin{equation}
+  J(\tau) = \int_0^{\tau}\bigl[B(t)+\ell(t)\bigr]\dd t \;+\; \int_{\tau}^{T} A\,C(t;r)\dd t \;+\; S(\tau). \label{eq:J}
+\end{equation}
+Define the \emph{marginal gap}
+\begin{equation}
+  g(t) := B(t) + \ell(t) - A\,C(t;r). \label{eq:g}
+\end{equation}
+$g<0$ means the marginal cost of switching now exceeds the marginal cost of waiting one more month; $g>0$ means the reverse.
+
+\begin{proposition}[Smooth first-order condition]\label{prop:foc}
+On any interval on which $S$ is differentiable, a stationary point $\tau^*$ of $J$ satisfies
+\begin{equation}
+  B(\tau^*) + \ell(\tau^*) + S'(\tau^*) = A\,C(\tau^*;r). \label{eq:foc}
+\end{equation}
+In particular, between steps of $S$, where $S'=0$, the condition is $g(\tau^*)=0$.
+\end{proposition}
+\begin{proof}
+By the Leibniz rule, $J'(\tau) = B(\tau)+\ell(\tau) - A\,C(\tau;r) + S'(\tau)$. Setting this to zero and rearranging gives \eqref{eq:foc}.
+\end{proof}
+
+\begin{remark}
+An earlier informal version of this argument wrote the condition as $B = AC + S'$, with the sign of $S'$ reversed. This is harmless where $S$ is piecewise constant (the case treated here), but is corrected in \eqref{eq:foc}.
+\end{remark}
+
+\begin{proposition}[Second-order condition and uniqueness]\label{prop:soc}
+Between steps, $J''(\tau) = g'(\tau)$, with
+\begin{equation}
+  g'(t) = B_0\beta \;-\; \lambda\,\ell(t) \;-\; A\,\pderiv{C}{t}(t;r). \label{eq:gprime}
+\end{equation}
+Since $\partial_t C\le 0$, the first and third terms are non-negative and the second is non-positive. A sufficient condition for an interior root $\tau^*$ of $g$ to be a strict local minimum is
+\begin{equation}
+  B_0\beta + A\Bigl|\pderiv{C}{t}(\tau^*;r)\Bigr| > \lambda\,\ell_0 e^{-\lambda\tau^*}. \label{eq:soc}
+\end{equation}
+If \eqref{eq:soc} holds for all $t\in[0,T]$ then $g$ is strictly increasing and has at most one root.
+\end{proposition}
+\begin{proof}
+Differentiate \eqref{eq:g} using \eqref{eq:B}, \eqref{eq:ell} and Lemma~\ref{lem:dC}. Strict monotonicity of $g$ implies at most one zero crossing.
+\end{proof}
+
+With $\ell_0=0$ the condition is automatic whenever $\beta>0$ or $C$ is strictly decreasing. At the default parameters of Table~\ref{tab:params}, $\min_{t\in[0,36]} g'(t) = 0.0167 > 0$, so the interior optimum is unique.
+
+The boundary cases are: if $g(0)\ge 0$ the optimum is $\tau^*=0$ (switch immediately); if $g(T)<0$ no interior crossing exists within the horizon.
+
+\section{Step discontinuities at context formation}
+\label{sec:step}
+
+Let $J_0$ denote the objective with $S\equiv s_0$ (no steps) and let $\tau_s$ be its interior minimiser. Now add a single step of height $\Delta$ at a context-formation date $t_c<\tau_s$.
+
+\begin{proposition}[Relocation to the step]\label{prop:step}
+With $J(\tau) = J_0(\tau) + \Delta\,H(\tau-t_c)$, the global minimiser is
+\begin{equation}
+  \tau^* = \begin{cases} t_c^- & \text{if } \Delta > \Delta^* := J_0(t_c) - J_0(\tau_s), \\ \tau_s & \text{otherwise,}\end{cases}
+\end{equation}
+where $t_c^-$ denotes switching immediately \emph{before} the context forms. Moreover
+\begin{equation}
+  \Delta^* = \int_{t_c}^{\tau_s}\bigl(-g(t)\bigr)\dd t. \label{eq:deltastar}
+\end{equation}
+\end{proposition}
+\begin{proof}
+On $[0,t_c)$, $J=J_0$, which is decreasing there (since $g<0$ for $t<\tau_s$), so the best point in that interval is the left limit at $t_c$, with cost $J_0(t_c)$. On $[t_c,T]$, $J = J_0+\Delta$, minimised at $\tau_s$ with cost $J_0(\tau_s)+\Delta$. Compare. For \eqref{eq:deltastar}, $J_0(t_c)-J_0(\tau_s) = -\int_{t_c}^{\tau_s}J_0'(t)\dd t = -\int_{t_c}^{\tau_s} g(t)\dd t$.
+\end{proof}
+
+\begin{corollary}
+$\Delta^*$ is small whenever $g$ is small on $[t_c,\tau_s]$, i.e.\ whenever the crossing is shallow. In that regime the cost of switching early in the smooth model is second-order, and even a modest re-introduction penalty relocates the optimum to the step.
+\end{corollary}
+
+At the default parameters with $t_c=1$ month (a new academic context forming roughly two weeks from the time of writing), $\Delta^* = 1.21$, equivalent to $2.20$ months of baseline boymoding cost $B_0$. Figure~\ref{fig:step} shows $J(\tau)$ for four values of $\Delta$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{step}
+  \caption{Total cost $J(\tau)$ with a step of height $\Delta$ in the switching cost at month~1. For $\Delta>\Delta^*=1.21$ the global optimum moves from the smooth crossing at $12.6$ months to just before the step.}
+  \label{fig:step}
+\end{figure}
+
+\section{Sensitivity of the interior optimum}
+\label{sec:sens}
+
+Let $\theta$ be any parameter and write $g(\tau;\theta)$. By the implicit function theorem applied to $g(\tau^*;\theta)=0$,
+\begin{equation}
+  \pderiv{\tau^*}{\theta} = -\,\frac{\partial g/\partial\theta}{\partial g/\partial\tau}\bigg|_{\tau^*}. \label{eq:ift}
+\end{equation}
+Since $g'(\tau^*)>0$ by Proposition~\ref{prop:soc}, the sign of $\partial\tau^*/\partial\theta$ is the opposite of the sign of $\partial g/\partial\theta$. Table~\ref{tab:sens} lists every partial.
+
+\begin{table}[t]
+  \centering
+  \caption{Analytic sensitivities of $\tau^*$ and their values at the defaults ($\tau^*=12.63$). ``FD'' is a central finite-difference check on the numerical solver.}
+  \label{tab:sens}
+  \begin{tabular}{llrrr}
+    \toprule
+    $\theta$ & $\partial g/\partial\theta$ & sign of $\partial\tau^*/\partial\theta$ & value & FD \\
+    \midrule
+    $r$ & $-A\,\partial_r C > 0$ & $-$ & $-7.60$ & $-7.60$ \\
+    $\beta$ & $B_0\tau^* > 0$ & $-$ & $-377$ & $-377$ \\
+    $B_0$ & $1+\beta\tau^* > 0$ & $-$ & $-74.9$ & --- \\
+    $\ell_0$ & $e^{-\lambda\tau^*} > 0$ & $-$ & $-37.2$ & --- \\
+    $A$ & $-C(\tau^*) < 0$ & $+$ & $+51.5$ & $+51.5$ \\
+    $\cface$ & $-A\prod_{i\ne\mathrm{f}}(1-c_i) < 0$ & $+$ & $+4.58$ & --- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Three observations.
+
+\paragraph{The growth rate $\beta$ dominates.} $\partial\tau^*/\partial\beta=-377$ months per unit means that raising $\beta$ from $0.03$ to $0.04$ moves the optimum earlier by nearly four months. Models that set $\beta=0$ therefore systematically overstate $\tau^*$. Because the marginal gap $g$ is shallow near its root, small changes in the slope of $B$ move the root a long way.
+
+\paragraph{Preparation has increasing returns.} $\partial\tau^*/\partial r = -A\,\partial_r C / g'$, and from \eqref{eq:dCdr} $|\partial_r C|$ is proportional to the survival product $\Pi$, which itself grows as $r$ removes cues. Numerically $-\partial\tau^*/\partial r$ rises from $7.6$ at $r=0.15$ to $15.6$ at $r=1$ (Figure~\ref{fig:bias}). Removing the last cue is worth more than removing the first, because the multiplicative structure means each surviving cue caps the benefit of removing the others.
+
+\paragraph{Life-lost weighting collapses the optimum.} Standard time discounting weights future costs less and therefore biases models of this kind toward delay. The irreversibility of youth argues the opposite weighting. With $\ell_0=0.2$ the interior optimum moves from $12.6$ to $2.0$ months; with $\ell_0\ge 0.3$ it is $\tau^*=0$ (Figure~\ref{fig:lifelost}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{life_lost}
+  \caption{Adding the life-lost rate $\ell(t)$ to the boymoding cost. Each curve is labelled with the resulting interior optimum.}
+  \label{fig:lifelost}
+\end{figure}
+
+\section{Bias in self-perception}
+\label{sec:bias}
+
+The decision-maker estimates $\cface$ from their own perception of their face. There is strong reason to believe this sensor is biased upward (pessimistic): the person checks against an expectation, in varying light, many times a day, and the comparison is against a mental image rather than a stable reference. Let the perceived face cue be $\hat c_{\mathrm{f}} = \cface + b$ with $b>0$.
+
+From Table~\ref{tab:sens}, $\partial\tau^*/\partial\cface>0$: a pessimistic bias delays the perceived optimum. The magnitude, however, depends sharply on $r$:
+\begin{equation}
+  \pderiv{\tau^*}{\cface} = \frac{A}{g'(\tau^*)}\prod_{i\ne\mathrm{f}}\bigl(1-c_i(r)\bigr). \label{eq:biassens}
+\end{equation}
+The product on the right is the probability that none of the \emph{non-face} cues fires. When it is small (little preparation, $r\approx 0$), the face cannot change the decision much because the person is going to be clocked on voice or hair regardless. When it is close to one (full preparation), the face is the binding cue and every unit of perceived $\cface$ moves $\tau^*$ directly.
+
+\begin{table}[t]
+  \centering
+  \caption{Sensitivity of $\tau^*$ to perceived face cue, and to preparation, as a function of $r$.}
+  \label{tab:biasr}
+  \begin{tabular}{rrr}
+    \toprule
+    $r$ & $\partial\tau^*/\partial\cface$ (mo/unit) & $-\partial\tau^*/\partial r$ (mo/unit) \\
+    \midrule
+    0.15 & 4.58 & 7.60 \\
+    0.40 & 8.76 & 9.93 \\
+    0.60 & 13.27 & 11.57 \\
+    0.80 & 19.30 & 13.35 \\
+    1.00 & 27.64 & 15.64 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:biasr} and Figure~\ref{fig:bias} give the numbers. At $r=0.15$ a bias of $b=0.10$ delays $\tau^*$ by about half a month; at $r=0.8$ the same bias delays it by nearly two months ($5.79\to7.66$). This corrects an earlier informal claim that biased perception ``propagates straight through'' to a late optimum: it does so only once the other cues have been dealt with. The practical corollary is that calibrating self-perception (controlled monthly photographs, external feedback) becomes important precisely when the preparation work is done, and not before.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{bias_by_prep}
+  \caption{Both sensitivities grow with $r$. The face-perception sensitivity grows faster because it is proportional to the survival product of the other cues, \eqref{eq:biassens}.}
+  \label{fig:bias}
+\end{figure}
+
+\section{The optimum is a vector}
+\label{sec:contexts}
+
+The hostility coefficient $A$ and the switching cost $S$ are properties of a social context, not of the decision-maker. With contexts indexed by $j$, the boymoding and life-lost streams are shared but everything else is context-specific:
+\begin{equation}
+  J(\boldsymbol{\tau}) = \sum_j \Biggl[\int_0^{\tau_j}\bigl[B_j(t)+\ell_j(t)\bigr]\dd t + \int_{\tau_j}^T A_j\,C(t;r)\dd t + S_j(\tau_j)\Biggr]. \label{eq:Jvec}
+\end{equation}
+If the contexts do not interact, \eqref{eq:Jvec} is separable and each $\tau_j^*$ solves its own copy of \eqref{eq:foc}. Solving for a single global $\tau^*$ with a pooled $A$ is a modelling error that optimises for the most hostile context and applies that answer everywhere.
+
+At the defaults, with three illustrative contexts (Figure~\ref{fig:ctx}): a newly forming context with $A=0.45$ and a step $\Delta=1.5$ at month~1 gives $\tau^*=0$; a general urban context with $A=0.80$ gives $\tau^*=12.6$; a high-hostility home context with $A=1.20$ gives $\tau^*=33.1$.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\textwidth]{contexts}
+  \caption{Per-context optima at the default parameters. The same person, the same face, three different answers.}
+  \label{fig:ctx}
+\end{figure}
+
+\begin{remark}[Coupling]
+Contexts can interact through visibility spillover: being out in context $j$ raises the probability of being known to be trans in context $k$. A minimal model replaces $C$ in context $k$ by $1-(1-C)(1-\rho_{jk}\,\mathbf{1}[t\ge\tau_j])$ with $\rho_{jk}\in[0,1]$. This breaks separability and couples the $\tau_j$; it is not pursued here.
+\end{remark}
+
+\section{Numerical implementation and verification}
+
+The model is implemented in Python (\texttt{transition\_timing}, \S\ref{sec:code}). Every analytic derivative in this note is checked against a central finite difference: $\partial_r C$ and $\partial_t C$ to relative error $10^{-8}$; $g'$ to $10^{-7}$; $\partial\tau^*/\partial r$, $\partial\tau^*/\partial\beta$ and $\partial\tau^*/\partial A$ to $10^{-4}$. The interior root is found by Brent's method on $g$ and the global optimum by comparing $J$ at the interior root, the endpoints, and the left limit of every step. A test suite of 25 cases covers limits, monotonicity, the derivative identities, the step relocation of Proposition~\ref{prop:step}, and the signs in Table~\ref{tab:sens}.
+
+\begin{table}[t]
+  \centering
+  \caption{Default parameters. These reproduce the interactive chart in the repository README.}
+  \label{tab:params}
+  \begin{tabular}{llr}
+    \toprule
+    symbol & meaning & value \\
+    \midrule
+    $B_0$ & baseline boymoding cost & 0.55 \\
+    $\beta$ & growth rate of boymoding cost & 0.03 \\
+    $\ell_0,\lambda$ & life-lost amplitude, decay & 0, 0.03 \\
+    $A$ & context hostility & 0.80 \\
+    $r$ & preparation fraction & 0.15 \\
+    $c_0, c_\infty$ & face cue at $t=0$, floor & 0.70, 0.15 \\
+    $k, t_h$ & face-change rate, half-way month & 0.18, 16 \\
+    $(c^0,e)_{\mathrm{hair}}$ & & (0.60, 0.85) \\
+    $(c^0,e)_{\mathrm{brow}}$ & & (0.40, 0.85) \\
+    $(c^0,e)_{\mathrm{voice}}$ & & (0.75, 0.80) \\
+    $T$ & horizon, months & 36 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{crossing}
+  \caption{The two marginal cost streams at the default parameters. The interior optimum is the crossing at $\tau^*=12.63$ months.}
+  \label{fig:crossing}
+\end{figure}
+
+\section{What the model can and cannot say}
+
+\paragraph{It cannot produce a number.} Every parameter in Table~\ref{tab:params} is unobservable and was set by judgement. Figure~\ref{fig:prep} shows $\tau^*$ ranging from $0$ to beyond the horizon across plausible parameter values. The model is not identified and should not be used to compute a date.
+
+\paragraph{It can produce signs.} The partial derivatives in Table~\ref{tab:sens} are sign-robust across the parameter space: preparation, pain growth, baseline pain and life-lost weighting all move the optimum earlier; hostility and pessimistic self-perception move it later. These signs survive any reparametrisation that preserves the qualitative shapes of $B$ (non-decreasing) and $C$ (non-increasing in $t$, decreasing in $r$).
+
+\paragraph{It omits uncertainty.} The model is deterministic. A stochastic version would add an option value of waiting (information about how $\cface$ evolves arrives over time), which argues for delay, alongside the irreversibility of $\ell$, which argues for haste. The two effects are of opposite sign and neither is quantified here.
+
+\paragraph{It treats transition as a switch.} The real object is a set of partial, reversible, context-specific changes (name, pronouns, presentation) that can be made in any order. The vector formulation of \S\ref{sec:contexts} captures the context dimension but not the ordering of changes within a context.
+
+\paragraph{It models only the cost of being clocked, not the benefit of being out.} The life-lost term $\ell$ is a partial proxy for the latter. A fuller model would include a positive term for authentic time that is independent of whether one is clocked, which would move $\tau^*$ earlier still.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{prep_sweep}
+  \caption{Left: the visible-trans cost curve for several values of $r$. Right: the resulting interior optimum $\tau^*(r)$; the curve is convex, reflecting the increasing returns of \S\ref{sec:sens}.}
+  \label{fig:prep}
+\end{figure}
+
+\section{Code}
+\label{sec:code}
+
+The implementation is in \texttt{src/transition\_timing/}:
+\begin{itemize}[nosep]
+  \item \texttt{model.py} --- parameter dataclasses, cost streams, objective, solver, analytic sensitivities;
+  \item \texttt{plotting.py} --- every figure in this note;
+  \item \texttt{tests/test\_model.py} --- the verification suite;
+  \item \texttt{docs/index.html} --- a standalone interactive version of Figure~\ref{fig:crossing} for GitHub Pages.
+\end{itemize}
+
+\end{document}
