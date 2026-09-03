@@ -2,7 +2,7 @@
 
 An optimal-stopping model for the timing of social transition. The decision-maker balances an *increasing* marginal cost of continuing to boymode against a *decreasing* marginal cost of being out and read as trans. The paper derives the optimum, its sensitivities, and why it isn't a single number.
 
-**Paper:** [`docs/model.pdf`](docs/model.pdf)
+**Paper:** [`docs/model.pdf`](docs/model.pdf) — source in [`docs/model.tex`](docs/model.tex), Overleaf-ready (upload `docs/model.tex` + `docs/figures/*.png`)
 **Interactive chart:** enable GitHub Pages on `/docs` (see below) and it's at `https://<you>.github.io/transition-timing/`
 
 > GitHub strips scripts from READMEs, so the chart can't run here. The static version is below; the live one with sliders is `docs/index.html`.
@@ -66,7 +66,7 @@ per_context_optima([
 ## Build the paper
 
 ```bash
-cd docs && latexmk -pdf model.tex
+cd docs && pdflatex model.tex && pdflatex model.tex   # embedded bibliography, two passes
 ```
 
 ## Publish to GitHub
@@ -94,7 +94,8 @@ src/transition_timing/plotting.py  every figure
 tests/test_model.py                verification suite
 scripts/make_figures.py            regenerate figures/
 scripts/publish_to_github.sh       one-shot repo + Pages setup
-docs/model.tex, model.pdf          the paper
+docs/model.tex, model.pdf          the paper (intro / background / method / results / discussion / conclusion)
+docs/figures/                      PNG copies of the figures so docs/ is a self-contained Overleaf upload
 docs/index.html                    interactive chart (GitHub Pages)
 figures/                           PNG + PDF of each figure
 ```
