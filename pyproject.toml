@@ -9,7 +9,7 @@ description = "An optimal-stopping model for the timing of social transition"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Madeline" }]
+authors = [{ name = "Madeline Walsh", email = "walshj70@tcd.ie" }]
 dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
 [project.optional-dependencies]
