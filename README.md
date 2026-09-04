@@ -2,7 +2,7 @@
 
 An optimal-stopping model for the timing of social transition. The decision-maker balances an *increasing* marginal cost of continuing to boymode against a *decreasing* marginal cost of being out and read as trans. The paper derives the optimum, its sensitivities, and why it isn't a single number.
 
-**Paper:** [`docs/model.pdf`](docs/model.pdf) 
+**Paper:** [`docs/model.pdf`](docs/model.pdf) --- it will be here, I'm not done with it yet though. 
 
 > GitHub strips scripts from READMEs, so the chart can't run here. The static version is below; the live one with sliders is `docs/index.html`.
 
