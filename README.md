@@ -1,6 +1,6 @@
 # transition-timing
 
-An optimal-stopping model for the timing of social transition. The decision-maker balances an *increasing* marginal cost of continuing to boymode against a *decreasing* marginal cost of being out and read as trans. The paper derives the optimum, its sensitivities, and why it isn't a single number.
+An optimal-stopping model for the timing of social transition. The decision-maker balances an *increasing* marginal cost of continuing to boymode against a *decreasing* marginal cost of being out and read as trans. The paper derives the optimum, its sensitivities, and what matters on a person-by-person basis.
 
 **Paper:** [`docs/model.pdf`](docs/model.pdf) --- it will be here, I'm not done with it yet though. 
 
