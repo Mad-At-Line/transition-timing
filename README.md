@@ -2,8 +2,7 @@
 
 An optimal-stopping model for the timing of social transition. The decision-maker balances an *increasing* marginal cost of continuing to boymode against a *decreasing* marginal cost of being out and read as trans. The paper derives the optimum, its sensitivities, and why it isn't a single number.
 
-**Paper:** [`docs/model.pdf`](docs/model.pdf) — source in [`docs/model.tex`](docs/model.tex), Overleaf-ready (upload `docs/model.tex` + `docs/figures/*.png`)
-**Interactive chart:** enable GitHub Pages on `/docs` (see below) and it's at `https://<you>.github.io/transition-timing/`
+**Paper:** [`docs/model.pdf`](docs/model.pdf) 
 
 > GitHub strips scripts from READMEs, so the chart can't run here. The static version is below; the live one with sliders is `docs/index.html`.
 
@@ -28,11 +27,11 @@ First-order condition between steps: `B(τ*) + ℓ(τ*) = A·C(τ*, r)`.
 
 | Result | Where |
 |---|---|
-| `∂τ*/∂r < 0` and its magnitude *grows* with `r` — prep work has increasing returns | §5, fig. `prep_sweep` |
-| `∂τ*/∂β ≈ −377` mo/unit — the growth rate of boymoding pain dominates everything | §5, table 1 |
+| `∂τ*/∂r < 0` and its magnitude grows with `r` prep work has increasing returns | §5, fig. `prep_sweep` |
+| `∂τ*/∂β ≈ −377` mo/unit the growth rate of boymoding pain dominates everything | §5, table 1 |
 | Any weighting that respects irreversibility (`ℓ₀ > 0`) collapses `τ*` toward zero | §5, fig. `life_lost` |
 | A step in `S` at a context-formation date relocates the optimum to just before the step whenever `Δ > ∫(−g) dt`, which is small | §4, fig. `step` |
-| `τ*` is a vector — one entry per context — not a scalar | §7, fig. `contexts` |
+| `τ*` is a vector at one entry per context, not a scalar | §7, fig. `contexts` |
 | Self-perception bias barely matters while voice/hair dominate `C`, then becomes first-order once they're handled (`∂²τ*/∂c_face ∂r > 0`) | §6, fig. `bias_by_prep` |
 
 The model has **no predictive power over the number**. Every parameter is unobservable. What survives is the sign of every partial derivative, and those are robust.
@@ -61,43 +60,6 @@ per_context_optima([
     ("general",      0.80, ()),
     ("home",         1.20, ()),
 ], p)                                          # {'new context': 0.0, 'general': 12.63, 'home': 33.06}
-```
-
-## Build the paper
-
-```bash
-cd docs && pdflatex model.tex && pdflatex model.tex   # embedded bibliography, two passes
-```
-
-## Publish to GitHub
-
-With the [GitHub CLI](https://cli.github.com) installed and `gh auth login` done once:
-
-```bash
-./scripts/publish_to_github.sh transition-timing private   # or "public"
-```
-
-That creates the repo, pushes, and enables Pages on `/docs` so the interactive chart goes live. Without `gh`:
-
-```bash
-git add -A && git commit -m "Initial model"
-git remote add origin git@github.com:<you>/transition-timing.git
-git push -u origin main
-# then Settings → Pages → Source: main, folder /docs
-```
-
-## Layout
-
-```
-src/transition_timing/model.py     parameters, cost streams, objective, solver, sensitivities
-src/transition_timing/plotting.py  every figure
-tests/test_model.py                verification suite
-scripts/make_figures.py            regenerate figures/
-scripts/publish_to_github.sh       one-shot repo + Pages setup
-docs/model.tex, model.pdf          the paper (intro / background / method / results / discussion / conclusion)
-docs/figures/                      PNG copies of the figures so docs/ is a self-contained Overleaf upload
-docs/index.html                    interactive chart (GitHub Pages)
-figures/                           PNG + PDF of each figure
 ```
 
 ## Caveat
