@@ -1,4 +1,4 @@
-"""Regenerate every figure in figures/.  Run:  python scripts/make_figures.py"""
+"""Regenerate every figure in figures"""
 from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
