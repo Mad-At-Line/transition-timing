@@ -3,7 +3,7 @@ Optimal-stopping model for the timing of social transition.
 
 State variable
 --------------
-t : months since the start of hormone therapy (t = 0 at HRT start).
+t : months since the start of gender affirming hormone therapy (titty skittles) (t = 0 at HRT start).
 
 Cost streams
 ------------
@@ -11,7 +11,7 @@ B(t)        marginal cost per month of continuing to boymode
 l(t)        marginal value of authentic time (the "life lost" term)
 A * C(t, r) marginal cost per month of being socially transitioned and
             read as trans, where A is environment hostility and
-            C is clock probability
+            C is clock probability, higher if ur a brick, lower for passoids
 
 Clock probability
 -----------------
@@ -20,8 +20,8 @@ independent failure modes:
 
     C(t, r) = 1 - prod_i (1 - c_i(t, r))
 
-Only the face cue is hormone-gated; hair, brow and voice cues depend
-on preparation fraction r in [0, 1].
+Only the face cue is mostly hormone blocked; hair, brow and voice cues depend
+on preparation fraction r in [0, 1]. Take Face to represent the rest of body and fat shifts as well
 
 Objective
 ---------
@@ -45,9 +45,8 @@ from scipy.integrate import quad
 from scipy.optimize import brentq
 
 
-# --------------------------------------------------------------------------
+
 # Parameters
-# --------------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
@@ -154,9 +153,7 @@ class Params:
         return replace(self, **kw)
 
 
-# --------------------------------------------------------------------------
 # Model functions
-# --------------------------------------------------------------------------
 
 
 def _sigmoid(x):
@@ -241,9 +238,7 @@ def dg_dt(t, p: Params, r: float | None = None):
     return p.B0 * p.beta - p.lam * life_lost_rate(t, p) - p.A * dC_dt(t, p, r)
 
 
-# --------------------------------------------------------------------------
 # Objective and solver
-# --------------------------------------------------------------------------
 
 
 def objective(tau: float, p: Params, r: float | None = None) -> float:
@@ -259,7 +254,7 @@ def smooth_optimum(p: Params, r: float | None = None) -> float | None:
     """Root of g on [0, T] if one exists, else None.
 
     Returns 0.0 if g(0) >= 0 (should switch immediately) and None if
-    g(T) < 0 (crossing lies beyond the horizon).
+    g(T) < 0 (crossing lies beyond the horizon). Genuinely lost part of my mind working on this part.
     """
     r = p.r if r is None else r
     g0 = float(marginal_gap(0.0, p, r))
@@ -299,9 +294,7 @@ def optimum(p: Params, r: float | None = None) -> tuple[float | None, float]:
     return best_tau, best_J
 
 
-# --------------------------------------------------------------------------
 # Sensitivity of the smooth optimum
-# --------------------------------------------------------------------------
 
 
 def sensitivity(p: Params, r: float | None = None) -> dict[str, float]:
@@ -340,3 +333,4 @@ def per_context_optima(contexts: Iterable[tuple[str, float, tuple[Step, ...]]], 
         pj = p.with_(A=A_j, steps=tuple(steps_j))
         out[name] = optimum(pj)[0]
     return out
+
