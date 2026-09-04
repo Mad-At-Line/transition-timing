@@ -64,4 +64,4 @@ per_context_optima([
 
 ## Caveat
 
-This is a toy. It's deterministic, it treats transition as a single switch per context, and it models only the cost of being clocked, not the benefit of being out. See §9 of the paper.
+This is a toy. It's deterministic, it treats transition as a single switch per context, and it models only the cost of being clocked, not the benefit of being out. See §9 of the paper. Don't actually base your transition in this bs or the brainworms WILL eat you alive. 
